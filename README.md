@@ -4,7 +4,11 @@ A React chatbot with FastAPI, LiteLLM key failover, per-request response metadat
 
 ## Live URLs
 
-Add the public frontend, backend, and demo video URLs here after deployment. The backend health check is at `/health`.
+- Frontend on Vercel Hobby: https://lyftr-manavjaiswalug23-7128.vercel.app
+- Backend on Railway: https://lyftr-api-production.up.railway.app
+- Backend health check: https://lyftr-api-production.up.railway.app/health
+
+Add the narrated demo video URL after recording.
 
 ### Deploy without a paid subscription
 
@@ -12,13 +16,14 @@ Use [Railway Free](https://docs.railway.com/pricing/free-plan) for the Docker ba
 
 **1. Deploy the backend to Railway**
 
-- Import this GitHub repository as a Railway service. In its settings, set **Root Directory** to `/backend` and **Config File Path** to `/backend/railway.toml`. This uses the existing Dockerfile and sets `/health` as the deployment health check.
+- Import this GitHub repository as a Railway service. In its settings, set **Root Directory** to `/backend`, use the Dockerfile in that directory, and set **Healthcheck Path** to `/health`.
 - Attach a volume to the backend service with mount path `/data`.
-- Set the service variables below. Enter the keys directly in Railway. The default model is `gemini/gemini-2.5-flash-lite`. Use two Gemini API keys from separate projects if you want their quotas to be independent.
+- Set the service variables below. Enter the keys directly in Railway. The hosted model is `gemini/gemini-3.5-flash-lite`. Use two Gemini API keys from separate projects if you want their quotas to be independent.
 
   | Variable | Value |
   | --- | --- |
   | `LLM_API_KEYS` | Two comma-separated provider keys |
+  | `LLM_MODEL` | `gemini/gemini-3.5-flash-lite` |
   | `DATABASE_URL` | `sqlite:////data/app.db` |
   | `ENABLE_FAILURE_SIMULATION` | `true` |
   | `PORT` | `8000` |
