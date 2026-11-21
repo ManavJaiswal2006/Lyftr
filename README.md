@@ -6,12 +6,11 @@ A React chatbot with FastAPI, LiteLLM key failover, per-request response metadat
 
 Add the public frontend, backend, and demo video URLs here after deployment. The backend health check is at `/health`.
 
-One deployment option is a **Render Docker web service** for the backend and a **Render static site** for the frontend:
+The [Render Blueprint](https://render.com/deploy?repo=https://github.com/ManavJaiswal2006/Lyftr) creates a public Docker backend and a public React static site. It links the service URLs for the frontend build and backend CORS. The backend uses a paid Starter instance and a 1 GB persistent disk at `/data` so SQLite history survives redeploys.
 
-1. Push this repository to GitHub. Create the web service from the repo with root directory `backend`, Docker runtime, and health check path `/health`. Use a single instance and attach a persistent disk at `/data` on a plan that supports it.
-2. In the backend's environment settings, set `LLM_API_KEYS` to two provider keys, `DATABASE_URL=sqlite:////data/app.db`, and `ENABLE_FAILURE_SIMULATION=true`. The default model is `gemini/gemini-2.5-flash-lite`. Set `LLM_MODEL` if you use another LiteLLM provider/model. Let Render supply `PORT`.
-3. Create a static site from the same repo with root directory `frontend`, build command `npm ci && npm run build`, publish directory `dist`, and Node 22 or newer. Set `VITE_API_BASE_URL` to the public backend HTTPS URL in the frontend's build environment.
-4. Set `ALLOWED_ORIGINS` on the backend to the frontend HTTPS origin, with no trailing slash. Redeploy the backend, then open the frontend in a private browser window and run the verification steps below using the public URLs.
+1. Open the Blueprint link, authorize Render to access the GitHub repo, and review the resources and pricing.
+2. Enter two comma-separated Gemini keys for `LLM_API_KEYS` in Render's setup form. The default model is `gemini/gemini-2.5-flash-lite`. If using another provider, set `LLM_MODEL` on the backend service.
+3. After both deployments complete, open their public URLs. Verify the backend's `/health` endpoint and send a chat from the frontend before recording the demo.
 
 Use keys from separate quota pools if the provider applies rate limits per project or account. Store keys only in backend environment settings.
 
