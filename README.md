@@ -6,13 +6,30 @@ A React chatbot with FastAPI, LiteLLM key failover, per-request response metadat
 
 Add the public frontend, backend, and demo video URLs here after deployment. The backend health check is at `/health`.
 
-The [Render Blueprint](https://render.com/deploy?repo=https://github.com/ManavJaiswal2006/Lyftr) creates a public Docker backend and a public React static site. It links the service URLs for the frontend build and backend CORS. The backend uses a paid Starter instance and a 1 GB persistent disk at `/data` so SQLite history survives redeploys.
+### Deploy without a paid subscription
 
-1. Open the Blueprint link, authorize Render to access the GitHub repo, and review the resources and pricing.
-2. Enter two comma-separated Gemini keys for `LLM_API_KEYS` in Render's setup form. The default model is `gemini/gemini-2.5-flash-lite`. If using another provider, set `LLM_MODEL` on the backend service.
-3. After both deployments complete, open their public URLs. Verify the backend's `/health` endpoint and send a chat from the frontend before recording the demo.
+Use [Railway Free](https://docs.railway.com/pricing/free-plan) for the Docker backend and [Vercel Hobby](https://vercel.com/docs/plans/hobby) for the React frontend. Railway includes a 0.5 GB volume and $1 of resource usage per month on the Free plan. The backend sleeps when idle and stops serving if it exhausts the monthly credit.
 
-Use keys from separate quota pools if the provider applies rate limits per project or account. Store keys only in backend environment settings.
+**1. Deploy the backend to Railway**
+
+- Import this GitHub repository as a Railway service. In its settings, set **Root Directory** to `/backend` and **Config File Path** to `/backend/railway.toml`. This uses the existing Dockerfile and sets `/health` as the deployment health check.
+- Attach a volume to the backend service with mount path `/data`.
+- Set the service variables below. Enter the keys directly in Railway. The default model is `gemini/gemini-2.5-flash-lite`. Use two Gemini API keys from separate projects if you want their quotas to be independent.
+
+  | Variable | Value |
+  | --- | --- |
+  | `LLM_API_KEYS` | Two comma-separated provider keys |
+  | `DATABASE_URL` | `sqlite:////data/app.db` |
+  | `ENABLE_FAILURE_SIMULATION` | `true` |
+  | `PORT` | `8000` |
+
+- Under **Public Networking**, generate a domain targeting port `8000`. After deployment, visit `/health` on that HTTPS domain.
+
+**2. Deploy the frontend to Vercel**
+
+- Import the same GitHub repository in a Hobby project. Set **Root Directory** to `frontend` and use the **Vite** framework preset.
+- Add `VITE_API_BASE_URL` to the Production environment with the Railway HTTPS URL as its value, then deploy.
+- In Railway, set `ALLOWED_ORIGINS` to the production Vercel HTTPS origin with no trailing slash. Wait for the backend to redeploy, then open the Vercel URL and send a message. Use the verification steps below to check failover and caching before recording the demo.
 
 ## Run locally: with Docker and without
 
