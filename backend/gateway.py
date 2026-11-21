@@ -59,7 +59,13 @@ class Gateway:
             try:
                 answer = await self.request(messages, key, status)
             except (ProviderAPIError, ValueError, TimeoutError) as error:
-                logger.info("Provider attempt failed for %s (%s)", key_id, type(error).__name__)
+                if status is None:
+                    logger.warning(
+                        "Provider attempt failed for %s (%s, HTTP %s)",
+                        key_id,
+                        type(error).__name__,
+                        getattr(error, "status_code", None),
+                    )
                 continue
 
             self.cache.set_cache(cache_key, {
